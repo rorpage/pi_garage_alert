@@ -38,7 +38,7 @@ sudo pip install redis<br>
 	1. On https://dev.twitter.com/apps/new, create a new application
 1. Optional twillio (SMS) configuration
 	1. Sign up for a Twilio account at http://www.twilio.com.
-1. Option Redis configuration
+1. Optional Redis configuration
 	1. Register for a free Redis plan at https://redislabs.com and create a new resource
 1. Copy bin/pi_garage_alert.py to /usr/local/sbin
 1. Copy etc/pi_garage_alert_config.py to /usr/local/etc. Edit this file and specify the garage doors you have and alerts you'd like.
