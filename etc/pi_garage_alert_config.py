@@ -104,3 +104,13 @@ JABBER_AUTHORIZED_IDS = []
 
 GCM_KEY = ''
 GCM_TOPIC = ''
+
+##############################################################################
+# Redis settings
+##############################################################################
+
+# Leave the server URL blank to disable Redis support
+
+REDIS_SERVER_URL = ''
+REDIS_SERVER_PORT = 6379
+REDIS_SERVER_PASSWORD = ''

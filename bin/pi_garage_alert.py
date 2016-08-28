@@ -57,6 +57,8 @@ from sleekxmpp.xmlstream import resolver, cert
 from twilio.rest import TwilioRestClient
 from twilio.rest.exceptions import TwilioRestException
 
+import redis
+
 sys.path.append('/usr/local/etc')
 import pi_garage_alert_config as cfg
 
@@ -480,7 +482,7 @@ def rpi_status():
 # Logging and alerts
 ##############################################################################
 
-def send_alerts(logger, alert_senders, recipients, subject, msg, state):
+def send_alerts(logger, alert_senders, recipients, subject, msg, state, id):
     """Send subject and msg to specified recipients
 
     Args:
@@ -489,6 +491,15 @@ def send_alerts(logger, alert_senders, recipients, subject, msg, state):
         msg: Body of the alert
         state: The state of the door
     """
+
+    # Redis
+    if cfg.REDIS_SERVER_URL != '':
+        redis_server = redis.Redis(
+            host=cfg.REDIS_SERVER_URL,
+            port=cfg.REDIS_SERVER_PORT,
+            password=cfg.REDIS_SERVER_PASSWORD)
+        redis_server.set("garage_door_%s" % id, state)
+
     for recipient in recipients:
         if recipient[:6] == 'email:':
             alert_senders['Email'].send_email(recipient[6:], subject, msg)
@@ -622,6 +633,7 @@ class PiGarageAlert(object):
             status_report_countdown = 5
             while True:
                 for door in cfg.GARAGE_DOORS:
+                    index = cfg.GARAGE_DOORS.index(door)
                     name = door['name']
                     state = get_garage_door_state(door['pin'])
                     time_in_state = time.time() - time_of_last_state_change[name]
@@ -636,7 +648,7 @@ class PiGarageAlert(object):
                         if alert_states[name] > 0:
                             # Use the recipients of the last alert
                             recipients = door['alerts'][alert_states[name] - 1]['recipients']
-                            send_alerts(self.logger, alert_senders, recipients, name, "%s is now %s" % (name, state), state)
+                            send_alerts(self.logger, alert_senders, recipients, name, "%s is now %s" % (name, state), state, index)
                             alert_states[name] = 0
 
                         # Reset time_in_state
@@ -649,7 +661,7 @@ class PiGarageAlert(object):
 
                         # Has the time elapsed and is this the state to trigger the alert?
                         if time_in_state > alert['time'] and state == alert['state']:
-                            send_alerts(self.logger, alert_senders, alert['recipients'], name, "%s has been %s for %d seconds!" % (name, state, time_in_state), state)
+                            send_alerts(self.logger, alert_senders, alert['recipients'], name, "%s has been %s for %d seconds!" % (name, state, time_in_state), state, index)
                             alert_states[name] += 1
 
                 # Periodically log the status for debug and ensuring RPi doesn't get too hot

@@ -31,12 +31,15 @@ sudo pip install tweepy<br>
 sudo pip install twilio<br>
 sudo pip install requests<br>
 sudo pip install requests[security]<br>
+sudo pip install redis<br>
 1. Optional email configuration
 	1. Configure postfix to send mail using Google SMTP, or your ISP's SMTP server
 1. Optional twitter configuration
 	1. On https://dev.twitter.com/apps/new, create a new application
 1. Optional twillio (SMS) configuration
 	1. Sign up for a Twilio account at http://www.twilio.com.
+1. Option Redis configuration
+	1. Register for a free Redis plan at https://redislabs.com and create a new resource
 1. Copy bin/pi_garage_alert.py to /usr/local/sbin
 1. Copy etc/pi_garage_alert_config.py to /usr/local/etc. Edit this file and specify the garage doors you have and alerts you'd like.
 1. Copy init.d/pi_garage_alert to /etc/init.d
